@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import string
 import vincent
 import numpy
+from operator import itemgetter
 from textblob import TextBlob
 def get_text_sentiment(text):
     # create TextBlob object of passed tweet text
@@ -45,13 +46,25 @@ count_all = Counter()
 count_all.update(terms_stop)
 
 ### building co-occurrence matrix
-com = defaultdict(lambda : defaultdict(int))
+covar = {('',''):0}
 for i in range(len(terms_stop)-1):
     for j in range(i+1,len(terms_stop)):
         w2 = max(terms_stop[i],terms_stop[j])
         w1 = min(terms_stop[i],terms_stop[j])
         if(w1!=w2):
-            com[w1][w2]+=1 ;
+            if((w1,w2) not in covar):
+                covar[(w1,w2)]=1
+            else:
+                covar[(w1,w2)]+=1
+
+covar_count = Counter(covar) ;
+
+### building coccurence graph
+covar_count =covar_count.most_common(10)
+labels, freq = zip(*covar_count)
+data = {'data': freq, 'x': labels}
+bar = vincent.Bar(data, iter_idx='x')
+bar.to_json('co_occ_freq.json', html_out=True, html_path='chart2.html')
 
 
 ### building frequency graph
