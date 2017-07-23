@@ -2,15 +2,28 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
 from collections import defaultdict
+import matplotlib.pyplot as plt
 import string
 import vincent
-feedback = 'The system doesnt work perfectly its not upto the mark!'
+import numpy
+from textblob import TextBlob
+def get_text_sentiment(text):
+    # create TextBlob object of passed tweet text
+    analysis = TextBlob(text)        # set sentiment
+    if analysis.sentiment.polarity > 0:
+        return 'positive'
+    elif analysis.sentiment.polarity == 0:
+        return 'neutral'
+    else:
+        return 'negative'
 
 ### reading content from a textfile
 with open("sample.txt") as f:
     content = f.readlines()
 content = [x.strip() for x in content]
 
+for line in content:
+    print(line,get_text_sentiment(line))
 
 ### creating a word array from the lines
 words = []
@@ -39,6 +52,7 @@ for i in range(len(terms_stop)-1):
         w1 = min(terms_stop[i],terms_stop[j])
         if(w1!=w2):
             com[w1][w2]+=1 ;
+
 
 ### building frequency graph
 word_freq = count_all.most_common(20)
